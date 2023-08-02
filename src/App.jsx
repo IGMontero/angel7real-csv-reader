@@ -260,20 +260,4 @@ function processCSVs(subscriptionPaymentsCSV, ordersCSV) {
 	return result;
 }
 
-// Example usage:
-const subscriptionPaymentsCSV = `
-Amount,Completed At,Subscription Order ID
-50.00,2023-07-01,123456
-30.00,2023-07-02,789012
-`;
-
-const ordersCSV = `
-Amount,Entrenador,SendOwl Transaction ID
-50.00,John Doe,123456
-30.00,Jane Smith,789012
-`;
-
-const result = processCSVs(subscriptionPaymentsCSV, ordersCSV);
-console.log(result);
-
 export default App;
