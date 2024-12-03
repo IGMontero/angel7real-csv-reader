@@ -223,41 +223,62 @@ function App() {
 }
 
 function processCSVs(subscriptionPaymentsCSV, ordersCSV) {
-	const result = {};
+	try {
+		const result = {};
 
-	// Parse the subscription payments CSV
-	const subscriptionPaymentsData = Papa.parse(subscriptionPaymentsCSV, {
-		header: true,
-	}).data;
-	const subscriptionPaymentsMap = {};
+		// Parse the subscription payments CSV
+		const subscriptionPaymentsData = Papa.parse(subscriptionPaymentsCSV, {
+			header: true,
+		}).data;
+		const subscriptionPaymentsMap = {};
 
-	// Create a map of Subscription Order IDs to Amounts
-	for (const payment of subscriptionPaymentsData) {
-		subscriptionPaymentsMap[payment['Subscription Order ID']] = parseFloat(
-			payment['Amount']
-		);
-	}
+		console.log(subscriptionPaymentsData);
 
-	// Parse the orders CSV
-	const ordersData = Papa.parse(ordersCSV, { header: true }).data;
+		// Create a map of Subscription Order IDs to Amounts
+		for (const payment of subscriptionPaymentsData) {
+			subscriptionPaymentsMap[payment['Subscription Order ID']] = parseFloat(
+				payment['Amount']
+			);
+		}
 
-	// Calculate the total amount for each Entrenador
-	for (const order of ordersData) {
-		const entrenador = order['Entrenador'];
-		// Remove 0 at the start of the string
-		const sendOwlTransactionID = order['SendOwl Transaction ID']?.substring(1);
-		const amount = subscriptionPaymentsMap[sendOwlTransactionID];
+		console.log('subscriptionPaymentsMap', subscriptionPaymentsMap);
 
-		if (amount) {
-			if (result[entrenador]) {
-				result[entrenador] += amount;
-			} else {
-				result[entrenador] = amount;
+		// Parse the orders CSV
+		const ordersData = Papa.parse(ordersCSV, { header: true }).data;
+
+		console.log('Orders data', ordersData);
+
+		// Calculate the total amount for each Entrenador
+		for (const order of ordersData) {
+			try {
+				const entrenador = order['Entrenador'];
+				console.log('Entrenador:	', entrenador);
+				// Remove 0 at the start of the string
+				const sendOwlTransactionID = order['SendOwl Transaction ID'];
+
+				console.log('SendOwl Transaction ID:	', sendOwlTransactionID);
+				const amount = subscriptionPaymentsMap[sendOwlTransactionID];
+
+				if (amount) {
+					console.log('Amount:	', amount);
+					if (result[entrenador]) {
+						result[entrenador] += amount;
+					} else {
+						result[entrenador] = amount;
+					}
+				}
+			} catch (err) {
+				console.log('There was an error processing the order', order, err);
 			}
 		}
-	}
 
-	return result;
+		console.log(result);
+
+		return result;
+	} catch (err) {
+		console.error(err);
+		return {};
+	}
 }
 
 export default App;
